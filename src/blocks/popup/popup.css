@@ -12,3 +12,13 @@
   transition: visibility 0s, opacity 0.5s linear;
   transition: 500ms;
 }
+
+.popup__info-tooltip {
+  padding: 60px 36px;
+  text-align: center;
+  max-width: 358px;
+}
+
+.popup__info-tooltip-image {
+margin-bottom: 32px;
+}

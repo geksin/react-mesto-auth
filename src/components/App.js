@@ -9,6 +9,11 @@ import EditProfilePopup from './EditProfilePopup.js';
 import ImagePopup from './ImagePopup';
 import EditAvatarPopup from './EditAvatarPopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
+import ProtectedRoute from './ProtectedRoute.js';
+import Login from './Login.js';
+import * as auth from '../utils/auth.js';
+import Register from './Register.js';
+import { Route, Switch, Redirect, withRouter, useHistory } from 'react-router-dom';
 
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
@@ -134,21 +139,65 @@ function handleCardDelete(card) {
           })
     }
 
+    // авторизация
+
+    const history = useHistory();
+
+    const [loggedIn, setLoggedIn] = React.useState(false);
+
+    const [email, setEmail] = React.useState('');
+
+    function handleLogin(token){
+      setLoggedIn(true);
+      tokenCheck();
+    }
+
+    function tokenCheck() {
+          const token = localStorage.getItem('token');
+        if (token) {
+          auth.checkToken(token).then((res) => {
+            if (res){
+              setLoggedIn(true);
+              setEmail(res.data.email);
+              history.push("/");
+            }
+          }); 
+        }
+      }
+
+    React.useEffect(() => {
+      tokenCheck();
+    }, []);
+
+
+    function handleSignOut() {
+      localStorage.removeItem('token');
+      setLoggedIn(false);
+      history.push('/login')
+    }
 
   return (
     <>
     <CurrentUserContext.Provider value={currentUser}>
-      <Header />
-      <Main arrayCards={cards} onEditProfile={handleEditProfileClick} onDeleteCard={handleCardDelete} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} onCardClick={handleCardClick} onCardLikeApp={handleCardLike} />
+      <Header singOut={handleSignOut} email={email} />
+      <Switch>
+       <ProtectedRoute exact path="/" component={Main} loggedIn={loggedIn} arrayCards={cards} onEditProfile={handleEditProfileClick} onDeleteCard={handleCardDelete} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} onCardClick={handleCardClick} onCardLikeApp={handleCardLike} />
+        <Route path="/login">
+              <Login handleLogin={handleLogin} isOpen={isAddPlacePopupOpen} onClose={closeAllPopup} />
+        </Route>
+        <Route path="/register">
+              <Register handleLogin={handleLogin} />
+        </Route>
+        <Route exact path="/">
+          {loggedIn ? <Redirect to="/" /> : <Redirect to="/login" />}
+        </Route>
+        </Switch>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopup} onUpdateUser={handleUpdateUser} />
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopup} onAddPlace={handleAddPlaceSubmit} />
-
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopup} onUpdateAvatar={handleUpdateAvatar} /> 
-
       <PopupWithForm name="delete-card" formName="delete-card" title="Вы уверены?" isOpen={isDeleteCardPopupOpen} isClose={closeAllPopup}>
         <button type="button" className="popup__button-save">Уверен на все 100%</button>
       </PopupWithForm>
-
       <ImagePopup card={selectedCard} onClose={closeAllPopup} isOpen={isOpen}/>
       <Footer />
     </CurrentUserContext.Provider>
@@ -157,4 +206,4 @@ function handleCardDelete(card) {
   );
 }
 
-export default App;
+export default withRouter(App);
