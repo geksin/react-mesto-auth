@@ -1,0 +1,19 @@
+.popup__button-close {
+  margin-top: -50px;
+  margin-right: -54px;
+  background: none;
+  border: none;
+  align-self: flex-end;
+  transition: 1s;
+}
+
+.popup__button-close:hover {
+  opacity: 0.6;
+  transform: rotate(90deg);
+}
+
+@media screen and (max-width: 767px) {
+  .popup__button-close {
+    margin-right: 0;
+  }
+}
