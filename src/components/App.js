@@ -12,6 +12,7 @@ import AddPlacePopup from './AddPlacePopup.js';
 import ProtectedRoute from './ProtectedRoute.js';
 import Login from './Login.js';
 import * as auth from '../utils/auth.js';
+import InfoTooltip from './InfoTooltip'
 import Register from './Register.js';
 import { Route, Switch, Redirect, withRouter, useHistory } from 'react-router-dom';
 
@@ -95,7 +96,8 @@ function handleCardDelete(card) {
     setEditAvatarPopup(false);
     setDeleteCardPopup(false);
     setIsOpen(false);
-
+    setPopupToolTip(false);
+    setTimeout(() => setPopupToolTipStatus(false), 1000);
   }
 
 
@@ -141,6 +143,17 @@ function handleCardDelete(card) {
 
     // авторизация
 
+    const [popupToolTip, setPopupToolTip] = React.useState(false);
+    function handlePopupToolTip(){
+      setPopupToolTip(true)
+    }
+
+    const [popupToolTipStatus, setPopupToolTipStatus] = React.useState(false);
+    function handlePopupToolTipSucsess () {
+      setPopupToolTip(true);
+      setPopupToolTipStatus(true);
+    }
+
     const history = useHistory();
 
     const [loggedIn, setLoggedIn] = React.useState(false);
@@ -176,6 +189,34 @@ function handleCardDelete(card) {
       history.push('/login')
     }
 
+    function authLogin(email, password) {
+      auth.login(email, password)
+      .then((data) => {
+            handleLogin(data);
+            history.push('/');
+        }
+      )
+    .catch(err => {
+        console.log(err);
+        handlePopupToolTip();
+    });
+    }
+
+    function authRegister(email, password) {
+      auth.register(email, password)
+      .then((data) => {
+            handlePopupToolTipSucsess();
+            history.push('/login');
+        }
+      )
+    .catch(err => {
+        console.log(err);
+        handlePopupToolTip();
+    });
+    }
+
+
+
   return (
     <>
     <CurrentUserContext.Provider value={currentUser}>
@@ -183,10 +224,10 @@ function handleCardDelete(card) {
       <Switch>
        <ProtectedRoute exact path="/" component={Main} loggedIn={loggedIn} arrayCards={cards} onEditProfile={handleEditProfileClick} onDeleteCard={handleCardDelete} onAddPlace={handleAddPlaceClick} onEditAvatar={handleEditAvatarClick} onCardClick={handleCardClick} onCardLikeApp={handleCardLike} />
         <Route path="/login">
-              <Login handleLogin={handleLogin} isOpen={isAddPlacePopupOpen} onClose={closeAllPopup} />
+              <Login onLogin={authLogin} />
         </Route>
         <Route path="/register">
-              <Register handleLogin={handleLogin} />
+              <Register onRegister={authRegister}/>
         </Route>
         <Route exact path="/">
           {loggedIn ? <Redirect to="/" /> : <Redirect to="/login" />}
@@ -200,6 +241,7 @@ function handleCardDelete(card) {
       </PopupWithForm>
       <ImagePopup card={selectedCard} onClose={closeAllPopup} isOpen={isOpen}/>
       <Footer />
+      <InfoTooltip status={popupToolTipStatus} isOpen={popupToolTip} isClose={closeAllPopup}  />
     </CurrentUserContext.Provider>
   </>  
 

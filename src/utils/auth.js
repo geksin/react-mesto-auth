@@ -41,9 +41,3 @@ export const checkToken = (token) => {
   })
   .then(response => response.ok ? response.json() : Promise.reject(`Ошибка ${response.status}`)) 
 }
-
-
-
-// функция register - принимает почту и пароль, отправляет запрос регистрации на /signup
-// функция login - принимает почту и пароль, отправляет запрос авторизации на /signin . В ответ сервер вернет jwt, который нужно сохранить в localStorage
-// функция checkToken - принимает jwt, отправляет запрос на /users/me и возвращает данные пользователя

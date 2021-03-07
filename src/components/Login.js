@@ -1,74 +1,92 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import * as auth from '../utils/auth.js';
+import { withRouter } from 'react-router-dom';
 import './styles/Login.css';
-import InfoTooltip from './InfoTooltip.js'
 
 
-class Login extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      email: '',
-      password: '',
-      popup: false
-    }
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleToolTipPopup = this.handleToolTipPopup.bind(this);
-  }
 
-    handleToolTipPopup() {
-        this.setState({
-            popup: !this.state.popup
-          });
-    }
+function Login(props) {
+  const [userData, setUserData] = React.useState({email: '',password: ''});
 
-  handleChange(e) {
+  function handleChange(e) {
     const {name, value} = e.target;
-    this.setState({
+    setUserData({
+      ...userData,
       [name]: value
-    });
+    })
   }
+  
 
-  handleSubmit(e){
+  function handleSubmit(e){
     e.preventDefault();
-    if (!this.state.email || !this.state.password){
+    if (!userData.email || !userData.password){
       return;
     }
-    auth.login(this.state.email, this.state.password)
-    .then((data) => {
-            this.setState({email: '', password: ''} ,() => {
-            this.props.handleLogin(data);
-            this.props.history.push('/');
-            })
-        }
-      )
-    .catch(err => {
-        console.log(err);
-        this.handleToolTipPopup();
-    });
+    props.onLogin(userData.email, userData.password);
   }
 
-
-  render(){
-    return(
-      <div className="login">
+  return(
+          <div className="login">
         <h2 className="login__header">
           Вход
         </h2>
-        <form onSubmit={this.handleSubmit} className="login__form">
-         <input id="email" name="email" type="text" className="login__input" placeholder="Email" minLength={2} maxLength={40} required value={this.state.email} onChange={this.handleChange} />
-          <input className="login__input" required id="password" name="password" type="password" placeholder="Пароль" value={this.state.password} onChange={this.handleChange} />
+        <form onSubmit={handleSubmit} className="login__form">
+         <input id="email" name="email" type="text" className="login__input" placeholder="Email" minLength={2} maxLength={40} required value={userData.email} onChange={handleChange} />
+          <input className="login__input" required id="password" name="password" type="password" placeholder="Пароль" value={userData.password} onChange={handleChange} />
           <div className="login__button-container">
-            <button type="submit" onSubmit={this.handleSubmit} className="login__button">Войти</button>
+            <button type="submit" onSubmit={handleSubmit} className="login__button">Войти</button>
           </div>
         </form>
-        <InfoTooltip status={false} isOpen={this.state.popup} isClose={this.handleToolTipPopup}  />
       </div>
     )
-  }
+
 }
+
+
+
+// class Login extends React.Component {
+//   constructor(props){
+//     super(props);
+//     this.state = {
+//       email: '',
+//       password: '',
+//     }
+//     this.handleChange = this.handleChange.bind(this);
+//     this.handleSubmit = this.handleSubmit.bind(this);
+//   }
+
+//   handleChange(e) {
+//     const {name, value} = e.target;
+//     this.setState({
+//       [name]: value
+//     });
+//   }
+
+//   handleSubmit(e){
+//     e.preventDefault();
+//     if (!this.state.email || !this.state.password){
+//       return;
+//     }
+//     this.props.onLogin(this.state.email, this.state.password);
+//   }
+
+
+//   render(){
+//     return(
+//       <div className="login">
+//         <h2 className="login__header">
+//           Вход
+//         </h2>
+//         <form onSubmit={this.handleSubmit} className="login__form">
+//          <input id="email" name="email" type="text" className="login__input" placeholder="Email" minLength={2} maxLength={40} required value={this.state.email} onChange={this.handleChange} />
+//           <input className="login__input" required id="password" name="password" type="password" placeholder="Пароль" value={this.state.password} onChange={this.handleChange} />
+//           <div className="login__button-container">
+//             <button type="submit" onSubmit={this.handleSubmit} className="login__button">Войти</button>
+//           </div>
+//         </form>
+//       </div>
+//     )
+//   }
+// }
 
 export default withRouter(Login);
 

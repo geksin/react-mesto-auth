@@ -35,7 +35,7 @@ function InfoTooltip (props) {
                 <CloseButtonPopup isClose={props.isClose} />
                 <div className="popup__info-tooltip">
                     <img className="popup__info-tooltip-image" src={props.status ? iconSuccessPath : iconErrorsPath} alt="статус проверки" />
-                    <h2 className="popup__title">{props.status ? "Вы успешно зарегистрировались, переходим на страницу логина..." : "Что-то пошло не так! Проверьте информацию и попробуйте ёще."}</h2>
+                    <h2 className="popup__title">{props.status ? "Вы успешно зарегистрировались!" : "Что-то пошло не так! Проверьте информацию и попробуйте ёще."}</h2>
 
                 </div>
 
